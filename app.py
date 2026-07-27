@@ -1,3 +1,8 @@
+"""
+Aplikasi Sistem Pendukung Keputusan Analisis Potensi Penjualan UMKM
+Dibuat secara mandiri untuk pemenuhan Tugas Akhir / Skripsi
+"""
+
 import io
 from pathlib import Path
 
