@@ -2,6 +2,7 @@ streamlit
 pandas
 numpy
 plotly
+openpyxl
 joblib
 xgboost
-openpyxl
+scikit-learn
