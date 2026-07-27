@@ -1,4 +1,6 @@
 import io
+from pathlib import Path
+
 import joblib
 import pandas as pd
 import plotly.express as px
@@ -14,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# custom styling css biar tampilan dashboard makin rapi
+# custom styling css biar tampilan dashboard & sidebar makin rapi dan simetris
 st.markdown("""
     <style>
     .stApp { background-color: #0b1329; color: #f1f5f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -84,19 +86,35 @@ st.markdown("""
     div[data-testid="stFileUploader"] section { pointer-events: none; }
     div[data-testid="stFileUploader"] button { pointer-events: auto; }
 
+    /* Styling Menu Navigasi Sidebar - Diperkuat agar posisinya benar-benar pas di tengah */
     section[data-testid="stSidebar"] .stRadio > label { display: none; }
-    section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] { gap: 10px; }
+    section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] { gap: 8px; }
     section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
         background-color: #162032;
-        padding: 12px 16px;
+        padding: 10px 14px;
         border-radius: 8px;
         border: 1px solid #283548;
         transition: all 0.2s ease-in-out;
         width: 100%;
+        display: flex !important;
+        align-items: center !important;
+        cursor: pointer;
     }
     section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:hover {
         background-color: #1e293b;
         border-color: #0284c7;
+    }
+    section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label div {
+        display: flex !important;
+        align-items: center !important;
+    }
+    section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label p {
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #f1f5f9;
+        line-height: normal !important;
     }
     
     hr { border-color: #334155; margin: 1.5rem 0; }
@@ -327,7 +345,6 @@ elif nav == "2. Pembersihan Data":
             
             st.markdown("<br>", unsafe_allow_html=True)
             
-            # info dinamis ngikutin hasil cleaning real dari file user
             st.info(f"Sistem mendeteksi adanya {info_tampil['duplikat_dihapus']} baris data ganda (duplikat) dan {info_tampil['missing_value']} data kosong/anomali yang kemudian otomatis dibersihkan oleh sistem, sehingga menghasilkan total {info_tampil['total_bersih']} baris data bersih yang siap digunakan ke tahap ekstraksi fitur.")
             
             st.markdown("<br>", unsafe_allow_html=True)
@@ -545,7 +562,8 @@ elif nav == "6. Unduh Laporan":
                         cell_d.number_format = '#,##0.00'
                         cell_d.alignment = Alignment(horizontal="right", vertical="center")
                     elif col_key == "Rata_Qty":
-                        cell_d.number_format = '0.##'
+                        # Dibatasi 2 angka di belakang koma agar rapi dan profesional
+                        cell_d.number_format = '0.00'
                         cell_d.alignment = Alignment(horizontal="right", vertical="center")
                     elif c_idx == 1:
                         cell_d.alignment = Alignment(horizontal="left", vertical="center")
