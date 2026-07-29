@@ -288,22 +288,8 @@ st.markdown(f"""
         font-weight: 800 !important;
         -webkit-text-fill-color: #ffffff !important;
     }}
-
-    /* === PERBAIKAN: sembunyikan bulatan radio bawaan secara menyeluruh ===
-       Sebelumnya hanya menyasar `label > div:first-child`, yang tidak selalu
-       cocok dengan struktur DOM BaseWeb di breakpoint mobile. Sekarang
-       menyasar beberapa kemungkinan elemen sekaligus supaya konsisten
-       di desktop maupun HP. */
-    div[data-testid="stRadio"] label > div:first-child,
-    div[data-testid="stRadio"] label [data-baseweb="radio"],
-    div[data-testid="stRadio"] label [data-baseweb="radio"] > div,
-    div[data-testid="stRadio"] label [role="radio"] {{
+    div[data-testid="stRadio"] label > div:first-child {{
         display: none !important;
-        width: 0 !important;
-        height: 0 !important;
-        overflow: hidden !important;
-        margin: 0 !important;
-        padding: 0 !important;
     }}
 
     section[data-testid="stSidebar"] {{
@@ -392,41 +378,6 @@ st.markdown(f"""
     }}
 
     hr {{ border-color: {COLOR_BORDER}; margin: 1.4rem 0; }}
-
-    /* === PERBAIKAN: konsistensi tampilan sidebar khusus di layar HP ===
-       Streamlit punya breakpoint mobile bawaan (<=640px) yang bisa membuat
-       struktur/ukuran beberapa komponen berubah. Blok ini memaksa ulang
-       styling utama supaya sidebar tetap konsisten dengan tampilan laptop. */
-    @media (max-width: 640px) {{
-        section[data-testid="stSidebar"] {{
-            width: 100% !important;
-            min-width: 100% !important;
-        }}
-        div[data-testid="stRadio"] label > div:first-child,
-        div[data-testid="stRadio"] label [data-baseweb="radio"],
-        div[data-testid="stRadio"] label [data-baseweb="radio"] > div,
-        div[data-testid="stRadio"] label [role="radio"],
-        div[data-testid="stRadio"] label span:first-child {{
-            display: none !important;
-            width: 0 !important;
-            height: 0 !important;
-        }}
-        section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {{
-            padding: 12px 16px !important;
-        }}
-        section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label p {{
-            font-size: 0.87rem !important;
-        }}
-        .kotak-judul-sidebar {{
-            padding: 18px 14px;
-        }}
-        .app-topbar {{
-            padding: 22px 20px;
-        }}
-        .app-topbar h1 {{
-            font-size: 1.3rem;
-        }}
-    }}
     </style>
 """, unsafe_allow_html=True)
 
@@ -554,10 +505,10 @@ def extract_product_features(clean_df):
         Frekuensi=("Qty", "count"),
         Rata_Harga=("Harga Satuan", "mean")
     ).reset_index()
-
+    
     features_df["Rata_Qty"] = features_df["Rata_Qty"].round(2)
     features_df["Rata_Harga"] = features_df["Rata_Harga"].round(2)
-
+    
     return features_df
 
 def run_model_prediction(model, encoder, df):
@@ -1023,13 +974,13 @@ elif nav == "5. Dashboard & Visualisasi":
             df_trend = st.session_state["data_bersih"].copy()
             df_trend["Bulan"] = df_trend["Tanggal Faktur"].dt.to_period("M").dt.to_timestamp()
             monthly_rekap = df_trend.groupby("Bulan").agg(Total_Qty=("Qty", "sum")).reset_index().sort_values("Bulan")
-
+            
             monthly_rekap["Bulan_Label"] = monthly_rekap["Bulan"].dt.strftime("%b %Y")
 
             fig_line = px.area(
-                monthly_rekap,
-                x="Bulan_Label",
-                y="Total_Qty",
+                monthly_rekap, 
+                x="Bulan_Label", 
+                y="Total_Qty", 
                 markers=True,
                 labels={"Bulan_Label": "Bulan"}
             )
