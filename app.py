@@ -410,6 +410,21 @@ st.markdown(f"""
             width: 0 !important;
             min-width: 0 !important;
         }}
+        /* Beri jarak samping supaya konten sidebar tidak menempel ke tepi
+           layar (terkesan "kepenuhan"/terlalu lebar) */
+        section[data-testid="stSidebar"] > div:first-child {{
+            padding-left: 14px !important;
+            padding-right: 14px !important;
+            box-sizing: border-box !important;
+        }}
+        /* Rapatkan jarak kosong di bagian paling atas sidebar pada mobile */
+        header[data-testid="stHeader"] {{
+            height: 2.75rem !important;
+            min-height: 2.75rem !important;
+        }}
+        section[data-testid="stSidebar"] {{
+            padding-top: 0.5rem !important;
+        }}
         div[data-testid="stRadio"] label > div:first-child,
         div[data-testid="stRadio"] label [data-baseweb="radio"],
         div[data-testid="stRadio"] label [data-baseweb="radio"] > div,
