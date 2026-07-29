@@ -606,14 +606,15 @@ def apply_plotly_theme(fig, title_text):
     fig.update_layout(
         template=PLOTLY_TEMPLATE,
         font=PLOTLY_FONT,
-        title=dict(text=title_text, font=dict(size=16, family="Poppins, sans-serif", color=COLOR_INK)),
-        legend=dict(orientation="h", yanchor="bottom", y=1.04, xanchor="right", x=1),
-        margin=dict(t=70, l=10, r=30, b=10),
+        title=dict(text=title_text, font=dict(size=16, family="Poppins, sans-serif", color=COLOR_INK), x=0, xanchor="left"),
+        legend=dict(orientation="h", yanchor="top", y=-0.18, xanchor="center", x=0.5),
+        margin=dict(t=55, l=10, r=20, b=70),
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
-        xaxis=dict(tickfont=dict(color=COLOR_INK, size=12), title_font=dict(color=COLOR_INK)),
-        yaxis=dict(tickfont=dict(color=COLOR_INK, size=12), title_font=dict(color=COLOR_INK)),
+        xaxis=dict(tickfont=dict(color=COLOR_INK, size=12), title_font=dict(color=COLOR_INK), automargin=True),
+        yaxis=dict(tickfont=dict(color=COLOR_INK, size=12), title_font=dict(color=COLOR_INK), automargin=True),
     )
+    fig.update_layout(title_font_size=15)
     return fig
 
 def render_topbar(title, desc):
@@ -1042,7 +1043,7 @@ elif nav == "5. Dashboard & Visualisasi":
                 yaxis_title=""
             )
             apply_plotly_theme(fig_bar, "10 Produk dengan Akumulasi Penjualan Tertinggi")
-            fig_bar.update_layout(height=420, margin=dict(l=10, r=60, t=70, b=10))
+            fig_bar.update_layout(height=460, margin=dict(l=10, r=60, t=55, b=70))
             st.plotly_chart(fig_bar, use_container_width=True)
 
             top_produk_nama = top_10.iloc[0]["Nama Barang"]
@@ -1072,13 +1073,15 @@ elif nav == "5. Dashboard & Visualisasi":
             fig_line.update_traces(line_color=COLOR_PRIMARY, fillcolor="rgba(55,48,209,0.12)")
             apply_plotly_theme(fig_line, "Grafik Tren Historis Kuantitas Penjualan Bulanan")
             fig_line.update_layout(
-                height=360,
+                height=400,
+                margin=dict(t=55, l=10, r=20, b=90),
                 xaxis=dict(
                     title="Bulan",
                     tickfont=dict(color=COLOR_INK, size=12),
                     title_font=dict(color=COLOR_INK),
                     categoryorder="array",
-                    categoryarray=monthly_rekap["Bulan_Label"].tolist()
+                    categoryarray=monthly_rekap["Bulan_Label"].tolist(),
+                    tickangle=-35
                 )
             )
             st.plotly_chart(fig_line, use_container_width=True)
