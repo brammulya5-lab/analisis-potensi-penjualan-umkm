@@ -787,7 +787,7 @@ if nav == "1. Upload Data":
 
         render_next_step_button(0)
     else:
-        st.info("Silakan unggah file laporan data penjualan terlebih dahulu untuk memulai analisis.")
+        st.info("Silahkan unggah file laporan data penjualan terlebih dahulu untuk memulai analisis.")
 
 # MENU 2: PEMBERSIHAN DATA
 
