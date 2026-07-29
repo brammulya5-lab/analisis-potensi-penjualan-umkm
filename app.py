@@ -410,21 +410,6 @@ st.markdown(f"""
             width: 0 !important;
             min-width: 0 !important;
         }}
-        /* Beri jarak samping supaya konten sidebar tidak menempel ke tepi
-           layar (terkesan "kepenuhan"/terlalu lebar) */
-        section[data-testid="stSidebar"] > div:first-child {{
-            padding-left: 14px !important;
-            padding-right: 14px !important;
-            box-sizing: border-box !important;
-        }}
-        /* Rapatkan jarak kosong di bagian paling atas sidebar pada mobile */
-        header[data-testid="stHeader"] {{
-            height: 2.75rem !important;
-            min-height: 2.75rem !important;
-        }}
-        section[data-testid="stSidebar"] {{
-            padding-top: 0.5rem !important;
-        }}
         div[data-testid="stRadio"] label > div:first-child,
         div[data-testid="stRadio"] label [data-baseweb="radio"],
         div[data-testid="stRadio"] label [data-baseweb="radio"] > div,
@@ -787,7 +772,7 @@ if nav == "1. Upload Data":
         valid_dates = pd.to_datetime(date_col, errors="coerce").dropna()
         date_range_str = f"{valid_dates.min():%d/%m/%Y} - {valid_dates.max():%d/%m/%Y}" if not valid_dates.empty else "Tidak terdeteksi"
 
-        st.success(f"Berhasil diunggah: {st.session_state['nama_file_aktif']} siap diproses.")
+        st.success(f"Berhasil diunggah: {st.session_state['nama_file_aktif']} siap diproses!")
 
         st.markdown("<br>", unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
