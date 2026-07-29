@@ -651,12 +651,12 @@ if st.sidebar.button("🔄 Mulai Ulang Analisis", use_container_width=True):
 if nav == "1. Upload Data":
     render_topbar(
         "Sistem Pendukung Keputusan Analisis Potensi Penjualan Produk UMKM",
-        "Platform berbasis sistem cerdas yang dapat membantu pelaku UMKM mengklasifikasikan produk ke dalam kategori potensi penjualan serta memberikan rekomendasi prioritas pengelolaan stok berdasarkan data historis penjualan."
+        "Aplikasi cerdas ini membantu Anda mengelompokkan produk berdasarkan potensi penjualan sekaligus memberikan rekomendasi pengelolaan stok yang tepat berdasarkan riwayat transaksi toko Anda."
     )
 
     render_card_open(
         "📁 Unggah Laporan Data Penjualan",
-        "Unggah dokumen laporan penjualan berformat <b>Excel (.xlsx)</b>. Sistem akan mendeteksi secara otomatis kolom-kolom utama yang diperlukan, meliputi data <b>Tanggal Faktur/Transaksi</b>, <b>Nama Barang/Produk</b>, <b>Jumlah Terjual (Qty)</b>, dan <b>Harga Satuan</b> dengan berbagai variasi penamaan header secara fleksibel."
+        "Silahkan unggah file laporan data penjualan Anda dalam format <b>Excel (.xlsx)</b>. Sistem akan secara otomatis membaca data penting seperti <b>Tanggal Transaksi</b>, <b>Nama Produk</b>, <b>Jumlah Terjual (Qty)</b>, dan <b>Harga Satuan</b> tanpa perlu pengaturan rumit."
     )
 
     uploaded_file = st.file_uploader("Pilih file Excel laporan data penjualan (.xlsx)", type=["xlsx"], key="uploader_excel")
@@ -737,11 +737,9 @@ if nav == "1. Upload Data":
 elif nav == "2. Pembersihan Data":
     render_card_open(
         "🧹 Pembersihan Data (Data Cleaning)",
-        "Menu ini berfungsi untuk menyaring dan memvalidasi seluruh data transaksi yang telah diunggah "
-        "agar kualitas dataset benar-benar akurat sebelum dianalisis lebih lanjut. Sistem secara otomatis "
-        "mendeteksi serta menghapus baris data ganda atau duplikat, merapikan penulisan teks produk, "
-        "menghilangkan anomali atau nilai kosong, dan menyaring transaksi yang memiliki kuantitas serta "
-        "harga satuan valid di atas nol sehingga data siap diproses ke tahap ekstraksi fitur."
+        "Menu ini berfungsi untuk merapihkan dan memastikan data penjualan Anda bersih dari kesalahan. "
+        "Sistem secara otomatis menghapus data ganda, membuang data yang kosong, serta menyaring transaksi "
+        "yang memiliki jumlah dan harga jual valid (di atas nol) agar siap diproses ke tahap berikutnya."
     )
 
     if st.session_state["data_mentah"] is not None:
@@ -758,7 +756,7 @@ elif nav == "2. Pembersihan Data":
                         "Cek kembali isi kolom Qty/Harga Satuan pada file Anda (harus berupa angka > 0)."
                     )
                 else:
-                    st.success("Pembersihan data berhasil dilakukan.")
+                    st.success("Pembersihan data berhasil dilakukan!")
             except ValueError as ve:
                 st.error(f"Gagal membersihkan data: {ve}")
 
@@ -795,13 +793,13 @@ elif nav == "2. Pembersihan Data":
 elif nav == "3. Pembentukan Fitur":
     render_card_open(
         "⚙️ Pembentukan Fitur (Feature Engineering)",
-        "Menu ini berfungsi untuk merangkum seluruh baris data transaksi penjualan yang terpisah-pisah menjadi satu baris rekapitulasi khusus untuk setiap produk, yang menjadi landasan utama bagi model kecerdasan buatan dalam melakukan klasifikasi.<br><br>"
-        "<b>Penjelasan Kolom pada Tabel Ringkasan:</b><br>"
-        "• <b>Nama Barang:</b> Nama produk atau menu barang yang terjual.<br>"
-        "• <b>Total_Qty:</b> Akumulasi jumlah keseluruhan barang yang terjual dari awal hingga akhir periode.<br>"
-        "• <b>Rata_Qty:</b> Jumlah rata-rata barang yang biasanya terjual dalam sekali transaksi oleh pembeli.<br>"
+        "Menu ini digunakan untuk merangkum seluruh data transaksi penjualan yang sebelumnya terpisah-pisah menjadi satu ringkasan data per produk. Hasil ringkasan inilah yang nantinya akan dibaca oleh sistem kecerdasan buatan untuk melakukan klasifikasi.<br><br>"
+        "<b>Keterangan Kolom pada Tabel Ringkasan:</b><br>"
+        "• <b>Nama Barang:</b> Nama produk atau menu yang terjual.<br>"
+        "• <b>Total_Qty:</b> Total keseluruhan jumlah barang yang terjual dari awal hingga akhir periode.<br>"
+        "• <b>Rata_Qty:</b> Rata-rata jumlah barang yang biasanya terjual dalam sekali transaksi.<br>"
         "• <b>Frekuensi:</b> Seberapa sering produk tersebut dibeli atau muncul dalam catatan transaksi.<br>"
-        "• <b>Rata_Harga:</b> Rata-rata harga jual produk tersebut berdasarkan data transaksi yang tercatat."
+        "• <b>Rata_Harga:</b> Rata-rata harga jual produk tersebut berdasarkan catatan transaksi."
     )
 
     if st.session_state["data_bersih"] is not None:
@@ -809,7 +807,7 @@ elif nav == "3. Pembentukan Fitur":
             with st.spinner("Merangkum transaksi menjadi fitur per produk..."):
                 feat_df = extract_product_features(st.session_state["data_bersih"])
             st.session_state["data_fitur"] = feat_df
-            st.success("Perhitungan ringkasan produk selesai.")
+            st.success("Berhasil! Seluruh data transaksi berhasil dirangkum menjadi ringkasan produk yang siap dianalisis.")
     else:
         st.warning("Selesaikan Menu 2 (Pembersihan Data) terlebih dahulu.")
 
@@ -831,7 +829,10 @@ elif nav == "3. Pembentukan Fitur":
 elif nav == "4. Klasifikasi Potensi Penjualan":
     render_card_open(
         "🔍 Klasifikasi Potensi Penjualan",
-        "Menu ini berfungsi untuk menerapkan model kecerdasan buatan dalam mengklasifikasikan setiap produk ke dalam kategori potensi penjualan yang terdiri dari potensi tinggi, sedang, atau rendah berdasarkan ringkasan data transaksi yang telah diproses sebelumnya. Sistem secara otomatis mengevaluasi pola penjualan produk untuk memberikan rekomendasi pengelolaan stok yang akurat, di mana produk dengan potensi tinggi disarankan untuk ditingkatkan ketersediaannya, produk dengan potensi sedang dianjurkan untuk dipertahankan stoknya, dan produk dengan potensi rendah disarankan untuk dikurangi guna mengoptimalkan modal usaha."
+        "Menu ini menggunakan sistem cerdas untuk mengelompokkan setiap produk ke dalam kategori potensi penjualan "
+        "(Tinggi, Sedang, atau Rendah) berdasarkan data transaksi sebelumnya. Sistem secara otomatis memberikan "
+        "rekomendasi pengelolaan stok: tingkatkan stok untuk produk berpotensi tinggi, pertahankan untuk potensi sedang, "
+        "dan kurangi untuk potensi rendah agar modal usaha Anda lebih optimal."
     )
     render_card_close()
 
@@ -844,7 +845,7 @@ elif nav == "4. Klasifikasi Potensi Penjualan":
                 df_temp["Rekomendasi Stok"] = df_temp["Kategori Potensi"].map(RECOMMENDATION_MAPPING)
             st.session_state["data_hasil"] = df_temp
 
-            st.success("Proses klasifikasi berhasil dijalankan.")
+            st.success("Proses klasifikasi berhasil dijalankan!")
             st.markdown("<br>", unsafe_allow_html=True)
 
             c1, c2 = st.columns(2)
@@ -881,7 +882,9 @@ elif nav == "4. Klasifikasi Potensi Penjualan":
 elif nav == "5. Dashboard & Visualisasi":
     render_card_open(
         "📊 Dashboard & Visualisasi Grafik",
-        "Menu ini menyajikan grafik interaktif untuk melihat sebaran kategori produk, produk terlaris, serta tren penjualan dari waktu ke waktu agar Anda bisa memantau performa toko dengan lebih mudah."
+        "Menu ini menampilkan grafik yang interaktif dan mudah dipahami. Anda bisa melihat perbandingan "
+        "kategori produk, produk apa saja yang paling laris, serta bagaimana perkembangan tren penjualan "
+        "toko Anda dari waktu ke waktu."
     )
     render_card_close()
 
@@ -926,11 +929,11 @@ elif nav == "5. Dashboard & Visualisasi":
             top_kategori = pie_sorted.loc[0, "Kategori"]
             top_kategori_pct = pie_sorted.loc[0, "Jumlah Produk"] / total_items_all * 100
             st.info(
-                f"💡 **Saran Tindakan untuk Anda:** Dari total {total_items_all} produk yang dianalisis, ternyata sebagian besar ({top_kategori_pct:.1f}%) "
-                f"masuk dalam kategori {top_kategori}. "
-                f"Supaya modal usaha Anda tidak mandek, sebaiknya kurangi belanja stok untuk barang-barang yang lambat terjual atau buat paket promo (bundling) "
-                f"agar cepat habis. Di sisi lain, pastikan Anda mengamankan modal dan fokus memperbanyak stok untuk produk-produk yang potensinya tinggi "
-                f"supaya toko Anda tidak sampai kehabisan barang saat dicari pelanggan."
+                f"💡 **Saran untuk Toko Anda:** Dari total {total_items_all} produk yang dianalisis, sebagian besar produk "
+                f"ternyata masuk dalam kategori **{top_kategori}** ({top_kategori_pct:.1f}%). "
+                f"Supaya modal usaha Anda berputar dengan lancar, buat paket promo atau bundling untuk produk yang lambat terjual agar cepat habis. "
+                f"Selain itu, pastikan Anda selalu mengamankan stok dan memperbanyak persediaan untuk produk yang berpotensi tinggi "
+                f"supaya pelanggan tidak kecewa kehabisan barang."
             )
 
         elif pilihan_visual == "🏆 10 Produk Terbesar":
@@ -961,11 +964,10 @@ elif nav == "5. Dashboard & Visualisasi":
             top_produk_qty = int(top_10.iloc[0]["Total_Qty"])
             top_produk_kategori = top_10.iloc[0]["Kategori Potensi"]
             st.info(
-                f"💡 **Saran Tindakan untuk Anda:** Produk **{top_produk_nama}** terbukti menjadi bintang utama di toko Anda dengan total penjualan tembus "
-                f"{top_produk_qty:,} unit dan berstatus **{top_produk_kategori}**. "
-                f"Karena produk ini sangat diandalkan, pastikan pasokan bahan bakunya selalu aman dan jangan sampai putus. "
-                f"Anda bisa menjadikan produk ini sebagai andalan utama untuk promosi atau penawaran khusus agar bisa menarik lebih banyak pembeli "
-                f"dan mendongkrak omzet toko Anda lebih tinggi lagi."
+                f"💡 **Saran untuk Toko Anda:** Wah, produk **{top_produk_nama}** jadi juara di toko Anda dengan total penjualan mencapai "
+                f"{top_produk_qty:,} unit dan berstatus **{top_produk_kategori}**! "
+                f"Karena produk ini paling diandalkan pembeli, jaga terus ketersediaan stoknya dan jadikan sorotan utama "
+                f"untuk promosi agar omzet toko Anda semakin meningkat."
             )
 
         else:
@@ -1002,13 +1004,13 @@ elif nav == "5. Dashboard & Visualisasi":
                 arah_tren = "meningkat" if qty_akhir >= qty_awal else "menurun"
                 persen_perubahan = abs((qty_akhir - qty_awal) / qty_awal * 100) if qty_awal > 0 else 0
                 st.info(
-                    f"💡 **Saran Tindakan untuk Anda:** Penjualan toko Anda menunjukkan grafik yang **{arah_tren}** sebesar {persen_perubahan:.1f}% "
-                    f"dari bulan {monthly_rekap.iloc[0]['Bulan']:%b %Y} ({int(qty_awal):,} unit) ke bulan {monthly_rekap.iloc[-1]['Bulan']:%b %Y} ({int(qty_akhir):,} unit). "
-                    f"Kalau trennya sedang naik seperti ini, bersiaplah menambah stok lebih awal supaya Anda tidak kewalahan melayani pesanan pelanggan. "
-                    f"Sebaliknya, kalau nanti trennya terlihat melambat, kurangi belanja barang yang kurang laku agar uang kas toko tetap aman dan sehat."
+                    f"💡 **Saran untuk Toko Anda:** Dari catatan bulanan, tren penjualan toko Anda terlihat **{arah_tren}** sekitar {persen_perubahan:.1f}% "
+                    f"dari {monthly_rekap.iloc[0]['Bulan']:%b %Y} ({int(qty_awal):,} unit) ke {monthly_rekap.iloc[-1]['Bulan']:%b %Y} ({int(qty_akhir):,} unit). "
+                    f"Kalau penjualannya sedang naik, yuk siap-siap tambah stok dari awal supaya tidak keteteran melayani pembeli. "
+                    f"Sebaliknya, kalau trennya melambat, kurangi belanja barang yang kurang laku agar kas toko tetap aman."
                 )
             else:
-                st.info("💡 **Saran Tindakan untuk Anda:** Catatan transaksi historis pada data yang diunggah belum mencakup rentang waktu lebih dari satu bulan, sehingga grafik tren bulanan belum dapat menampilkan perbandingan antar bulan.")
+                st.info("💡 **Saran untuk Toko Anda:** Catatan transaksi historis pada data yang diunggah belum mencakup rentang waktu lebih dari satu bulan, sehingga grafik tren bulanan belum dapat menampilkan perbandingan antar bulan.")
 
         render_next_step_button(4, label_override="Lanjut ke 📥 Unduh Laporan →")
     else:
@@ -1019,8 +1021,8 @@ elif nav == "5. Dashboard & Visualisasi":
 elif nav == "6. Unduh Laporan":
     render_card_open(
         "📥 Unduh Laporan Hasil Analisis",
-        "<b>Fungsi menu ini:</b> mengekspor seluruh rekapitulasi klasifikasi potensi produk beserta "
-        "rekomendasi stok ke dalam dokumen Excel (.xlsx)."
+        "Pada menu ini, Anda bisa mengunduh seluruh hasil analisis dan rekomendasi pengelolaan stok produk "
+        "dalam bentuk file Excel (.xlsx) agar mudah disimpan, dibagikan, atau dicetak."
     )
 
     if st.session_state["data_hasil"] is not None:
