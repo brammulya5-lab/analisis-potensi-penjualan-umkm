@@ -410,6 +410,34 @@ st.markdown(f"""
             width: 0 !important;
             min-width: 0 !important;
         }}
+        /* Beri jarak samping supaya konten sidebar tidak menempel ke tepi
+           layar (terkesan "kepenuhan"/terlalu lebar) */
+        section[data-testid="stSidebar"] > div:first-child {{
+            padding-left: 14px !important;
+            padding-right: 14px !important;
+            box-sizing: border-box !important;
+        }}
+        /* Rapatkan jarak kosong di bagian paling atas sidebar pada mobile */
+        header[data-testid="stHeader"] {{
+            height: 2.75rem !important;
+            min-height: 2.75rem !important;
+        }}
+        section[data-testid="stSidebar"] {{
+            padding-top: 0.5rem !important;
+        }}
+        /* Poles visual overlay sidebar di HP supaya terasa seperti panel/drawer
+           modern (ada shadow, transisi halus), senada dengan versi desktop */
+        section[data-testid="stSidebar"][aria-expanded="true"] {{
+            box-shadow: 4px 0 24px -4px rgba(22, 27, 51, 0.18) !important;
+            transition: width 0.25s ease, transform 0.25s ease !important;
+            z-index: 999999 !important;
+        }}
+        section[data-testid="stSidebar"] {{
+            transition: width 0.25s ease, transform 0.25s ease !important;
+        }}
+        .kotak-judul-sidebar {{
+            margin-top: 4px;
+        }}
         div[data-testid="stRadio"] label > div:first-child,
         div[data-testid="stRadio"] label [data-baseweb="radio"],
         div[data-testid="stRadio"] label [data-baseweb="radio"] > div,
@@ -772,7 +800,7 @@ if nav == "1. Upload Data":
         valid_dates = pd.to_datetime(date_col, errors="coerce").dropna()
         date_range_str = f"{valid_dates.min():%d/%m/%Y} - {valid_dates.max():%d/%m/%Y}" if not valid_dates.empty else "Tidak terdeteksi"
 
-        st.success(f"Berhasil diunggah: {st.session_state['nama_file_aktif']} siap diproses!")
+        st.success(f"Berhasil diunggah: {st.session_state['nama_file_aktif']} siap diproses.")
 
         st.markdown("<br>", unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
@@ -787,7 +815,7 @@ if nav == "1. Upload Data":
 
         render_next_step_button(0)
     else:
-        st.info("Silahkan unggah file laporan data penjualan terlebih dahulu untuk memulai analisis.")
+        st.info("Silakan unggah file laporan data penjualan terlebih dahulu untuk memulai analisis.")
 
 # MENU 2: PEMBERSIHAN DATA
 
