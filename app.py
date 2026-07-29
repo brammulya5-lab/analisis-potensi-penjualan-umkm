@@ -398,9 +398,17 @@ st.markdown(f"""
        struktur/ukuran beberapa komponen berubah. Blok ini memaksa ulang
        styling utama supaya sidebar tetap konsisten dengan tampilan laptop. */
     @media (max-width: 640px) {{
-        section[data-testid="stSidebar"] {{
+        /* PENTING: lebar 100% hanya dipaksakan saat sidebar sedang terbuka
+           (aria-expanded="true"). Kalau dipaksakan tanpa syarat, animasi
+           collapse/tutup bawaan Streamlit jadi tertahan setengah jalan
+           karena "dilawan" oleh width:100% ini. */
+        section[data-testid="stSidebar"][aria-expanded="true"] {{
             width: 100% !important;
             min-width: 100% !important;
+        }}
+        section[data-testid="stSidebar"][aria-expanded="false"] {{
+            width: 0 !important;
+            min-width: 0 !important;
         }}
         div[data-testid="stRadio"] label > div:first-child,
         div[data-testid="stRadio"] label [data-baseweb="radio"],
