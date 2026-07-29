@@ -651,12 +651,12 @@ if st.sidebar.button("🔄 Mulai Ulang Analisis", use_container_width=True):
 if nav == "1. Upload Data":
     render_topbar(
         "Sistem Pendukung Keputusan Analisis Potensi Penjualan Produk UMKM",
-        "Aplikasi cerdas ini membantu Anda mengelompokkan produk berdasarkan potensi penjualan sekaligus memberikan rekomendasi pengelolaan stok yang tepat berdasarkan riwayat transaksi toko Anda."
+        "Aplikasi cerdas ini membantu Anda mengelompokkan produk berdasarkan potensi penjualannya sekaligus memberikan rekomendasi pengelolaan stok yang tepat berdasarkan riwayat transaksi toko Anda."
     )
 
     render_card_open(
         "📁 Unggah Laporan Data Penjualan",
-        "Silahkan unggah file laporan data penjualan Anda dalam format <b>Excel (.xlsx)</b>. Sistem akan secara otomatis membaca data penting seperti <b>Tanggal Transaksi</b>, <b>Nama Produk</b>, <b>Jumlah Terjual (Qty)</b>, dan <b>Harga Satuan</b> tanpa perlu pengaturan rumit."
+        "Silahkan unggah file laporan penjualan Anda dalam format <b>Excel (.xlsx)</b>. Sistem akan secara otomatis membaca data penting seperti <b>Tanggal Transaksi</b>, <b>Nama Produk</b>, <b>Jumlah Terjual (Qty)</b>, dan <b>Harga Satuan</b> tanpa perlu pengaturan rumit."
     )
 
     uploaded_file = st.file_uploader("Pilih file Excel laporan data penjualan (.xlsx)", type=["xlsx"], key="uploader_excel")
@@ -715,7 +715,7 @@ if nav == "1. Upload Data":
         valid_dates = pd.to_datetime(date_col, errors="coerce").dropna()
         date_range_str = f"{valid_dates.min():%d/%m/%Y} - {valid_dates.max():%d/%m/%Y}" if not valid_dates.empty else "Tidak terdeteksi"
 
-        st.success(f"Berhasil diunggah: {st.session_state['nama_file_aktif']} siap diproses!")
+        st.success(f"Berhasil diunggah: {st.session_state['nama_file_aktif']} siap diproses.")
 
         st.markdown("<br>", unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
@@ -730,7 +730,7 @@ if nav == "1. Upload Data":
 
         render_next_step_button(0)
     else:
-        st.info("Silahkan unggah file laporan data penjualan terlebih dahulu untuk memulai analisis!")
+        st.info("Silakan unggah file laporan data penjualan terlebih dahulu untuk memulai analisis.")
 
 # MENU 2: PEMBERSIHAN DATA
 
@@ -772,10 +772,10 @@ elif nav == "2. Pembersihan Data":
 
             st.markdown("<br>", unsafe_allow_html=True)
             st.info(
-                f"Sistem mendeteksi {info_tampil['duplikat_dihapus']} baris data ganda (duplikat) dan "
-                f"{info_tampil['missing_value']} data kosong/anomali yang otomatis dibersihkan, sehingga "
-                f"menghasilkan total {info_tampil['total_bersih']} baris data bersih yang siap digunakan "
-                f"pada tahap ekstraksi fitur."
+                f"Data Anda sudah berhasil dirapikan! Ada {info_tampil['duplikat_dihapus']} baris data ganda "
+                f"dan {info_tampil['missing_value']} data kosong yang otomatis dibersihkan. "
+                f"Kini tersisa total {info_tampil['total_bersih']} baris data bersih yang siap dilanjutkan "
+                f"ke tahap berikutnya."
             )
 
             st.markdown("<br>", unsafe_allow_html=True)
@@ -786,7 +786,7 @@ elif nav == "2. Pembersihan Data":
                 render_next_step_button(1)
     else:
         render_card_close()
-        st.warning("Belum ada data. Selesaikan Menu 1 (Upload Data) terlebih dahulu.")
+        st.warning("Belum ada data. Selesaikan Menu 1 (Upload Data) terlebih dahulu!")
 
 # MENU 3: PEMBENTUKAN FITUR
 
@@ -809,7 +809,7 @@ elif nav == "3. Pembentukan Fitur":
             st.session_state["data_fitur"] = feat_df
             st.success("Berhasil! Seluruh data transaksi berhasil dirangkum menjadi ringkasan produk yang siap dianalisis.")
     else:
-        st.warning("Selesaikan Menu 2 (Pembersihan Data) terlebih dahulu.")
+        st.warning("Selesaikan Menu 2 (Pembersihan Data) terlebih dahulu!")
 
     render_card_close()
 
@@ -1021,7 +1021,7 @@ elif nav == "5. Dashboard & Visualisasi":
 elif nav == "6. Unduh Laporan":
     render_card_open(
         "📥 Unduh Laporan Hasil Analisis",
-        "Pada menu ini, Anda bisa mengunduh seluruh hasil analisis dan rekomendasi pengelolaan stok produk "
+        "Di menu ini, Anda bisa mengunduh seluruh hasil analisis dan rekomendasi pengelolaan stok produk "
         "dalam bentuk file Excel (.xlsx) agar mudah disimpan, dibagikan, atau dicetak."
     )
 
@@ -1104,7 +1104,7 @@ elif nav == "6. Unduh Laporan":
                 ws_file.column_dimensions[col_letter_str].width = max(max_width_val + 5, 16)
 
         excel_buffer.seek(0)
-        st.success("File laporan Excel Anda sudah siap untuk diunduh.")
+        st.success("File laporan Excel Anda sudah siap untuk diunduh!")
         st.markdown("<br>", unsafe_allow_html=True)
         st.download_button(
             label="⬇️ Unduh Dokumen Laporan Rekomendasi (.xlsx)",
