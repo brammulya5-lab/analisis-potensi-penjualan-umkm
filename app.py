@@ -826,7 +826,7 @@ if nav == "1. Upload Data":
         valid_dates = pd.to_datetime(date_col, errors="coerce").dropna()
         date_range_str = f"{valid_dates.min():%d/%m/%Y} - {valid_dates.max():%d/%m/%Y}" if not valid_dates.empty else "Tidak terdeteksi"
 
-        st.success(f"Berhasil diunggah: {st.session_state['nama_file_aktif']} siap diproses.")
+        st.success(f"Berhasil diunggah! {st.session_state['nama_file_aktif']} siap diproses.")
 
         st.markdown("<br>", unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
@@ -841,7 +841,7 @@ if nav == "1. Upload Data":
 
         render_nav_buttons(0)
     else:
-        st.info("Silakan unggah file laporan data penjualan terlebih dahulu untuk memulai analisis.")
+        st.info("Silahkan unggah file laporan data penjualan terlebih dahulu untuk memulai analisis.")
 
 # MENU 2: PEMBERSIHAN DATA
 
@@ -1230,4 +1230,4 @@ elif nav == "6. Unduh Laporan":
         st.warning("Belum terdapat data hasil analisis. Harap selesaikan proses hingga Menu 4 terlebih dahulu.")
 
     render_card_close()
-    render_nav_buttons(5)
+    render_nav_buttons(5)   
