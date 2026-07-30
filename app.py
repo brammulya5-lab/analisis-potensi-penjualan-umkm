@@ -641,18 +641,43 @@ def go_to_step(step_key):
     st.session_state["nav_active"] = step_key
     st.rerun()
 
-def render_next_step_button(current_index, label_override=None):
-    if current_index >= len(NAV_STEPS) - 1:
+def render_nav_buttons(current_index, label_override=None, back_label_override=None, show_back=True):
+    has_prev = show_back and current_index > 0
+    has_next = current_index < len(NAV_STEPS) - 1
+
+    if not has_prev and not has_next:
         return
-    next_key = NAV_KEYS[current_index + 1]
-    next_icon = NAV_STEPS[current_index + 1][1]
-    next_label = NAV_STEPS[current_index + 1][2]
-    button_text = label_override or f"Lanjut ke {next_icon} {next_label} →"
+
     st.markdown("<div style='margin-top: 6px;'></div>", unsafe_allow_html=True)
-    col_spacer, col_btn = st.columns([2, 1.3])
-    with col_btn:
-        if st.button(button_text, key=f"lanjut_dari_{current_index}", use_container_width=True, type="secondary"):
-            go_to_step(next_key)
+
+    if has_prev:
+        prev_key = NAV_KEYS[current_index - 1]
+        prev_text = back_label_override or "← Kembali"
+
+    if has_next:
+        next_key = NAV_KEYS[current_index + 1]
+        next_icon = NAV_STEPS[current_index + 1][1]
+        next_label = NAV_STEPS[current_index + 1][2]
+        next_text = label_override or f"Lanjut ke {next_icon} {next_label} →"
+
+    if has_prev and has_next:
+        col_back, col_spacer, col_next = st.columns([0.9, 0.6, 1.8])
+        with col_back:
+            if st.button(prev_text, key=f"kembali_dari_{current_index}", use_container_width=True, type="secondary"):
+                go_to_step(prev_key)
+        with col_next:
+            if st.button(next_text, key=f"lanjut_dari_{current_index}", use_container_width=True, type="secondary"):
+                go_to_step(next_key)
+    elif has_prev:
+        col_back, col_spacer = st.columns([0.9, 2.4])
+        with col_back:
+            if st.button(prev_text, key=f"kembali_dari_{current_index}", use_container_width=True, type="secondary"):
+                go_to_step(prev_key)
+    else:
+        col_spacer, col_next = st.columns([2, 1.3])
+        with col_next:
+            if st.button(next_text, key=f"lanjut_dari_{current_index}", use_container_width=True, type="secondary"):
+                go_to_step(next_key)
 
 # INISIALISASI SESSION STATE & NAVIGASI YANG STABIL
 
@@ -814,7 +839,7 @@ if nav == "1. Upload Data":
         with st.expander("🔎 Tampilkan Pratinjau 10 Baris Pertama Data"):
             st.dataframe(df_preview.head(10), use_container_width=True, hide_index=True)
 
-        render_next_step_button(0)
+        render_nav_buttons(0)
     else:
         st.info("Silakan unggah file laporan data penjualan terlebih dahulu untuk memulai analisis.")
 
@@ -869,7 +894,7 @@ elif nav == "2. Pembersihan Data":
                 st.dataframe(st.session_state["data_bersih"].head(10), use_container_width=True, hide_index=True)
 
             if info_tampil["total_bersih"] > 0:
-                render_next_step_button(1)
+                render_nav_buttons(1)
     else:
         render_card_close()
         st.warning("Belum ada data. Selesaikan Menu 1 (Upload Data) terlebih dahulu!")
@@ -908,7 +933,7 @@ elif nav == "3. Pembentukan Fitur":
         st.write("**Tabel Ringkasan Fitur Produk:**")
         st.dataframe(df_tampil_fitur, use_container_width=True, hide_index=True)
 
-        render_next_step_button(2)
+        render_nav_buttons(2)
 
 # MENU 4: KLASIFIKASI POTENSI PENJUALAN
 
@@ -957,7 +982,7 @@ elif nav == "4. Klasifikasi Potensi Penjualan":
                 hide_index=True
             )
 
-            render_next_step_button(3)
+            render_nav_buttons(3)
         except Exception as err_msg:
             st.error(f"Terjadi kendala saat eksekusi model ML: {err_msg}")
     else:
@@ -1100,7 +1125,7 @@ elif nav == "5. Dashboard & Visualisasi":
             else:
                 st.info("💡 **Saran untuk Toko Anda:** Catatan transaksi historis pada data yang diunggah belum mencakup rentang waktu lebih dari satu bulan, sehingga grafik tren bulanan belum dapat menampilkan perbandingan antar bulan.")
 
-        render_next_step_button(4, label_override="Lanjut ke 📥 Unduh Laporan →")
+        render_nav_buttons(4, label_override="Lanjut ke 📥 Unduh Laporan →")
     else:
         st.warning("Jalankan Menu 4 (Prediksi & Klasifikasi) terlebih dahulu.")
 
@@ -1205,3 +1230,4 @@ elif nav == "6. Unduh Laporan":
         st.warning("Belum terdapat data hasil analisis. Harap selesaikan proses hingga Menu 4 terlebih dahulu.")
 
     render_card_close()
+    render_nav_buttons(5)
