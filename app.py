@@ -289,11 +289,6 @@ st.markdown(f"""
         -webkit-text-fill-color: #ffffff !important;
     }}
 
-    /* === PERBAIKAN: sembunyikan bulatan radio bawaan secara menyeluruh ===
-       Sebelumnya hanya menyasar `label > div:first-child`, yang tidak selalu
-       cocok dengan struktur DOM BaseWeb di breakpoint mobile. Sekarang
-       menyasar beberapa kemungkinan elemen sekaligus supaya konsisten
-       di desktop maupun HP. */
     div[data-testid="stRadio"] label > div:first-child,
     div[data-testid="stRadio"] label [data-baseweb="radio"],
     div[data-testid="stRadio"] label [data-baseweb="radio"] > div,
@@ -393,15 +388,7 @@ st.markdown(f"""
 
     hr {{ border-color: {COLOR_BORDER}; margin: 1.4rem 0; }}
 
-    /* === PERBAIKAN: konsistensi tampilan sidebar khusus di layar HP ===
-       Streamlit punya breakpoint mobile bawaan (<=640px) yang bisa membuat
-       struktur/ukuran beberapa komponen berubah. Blok ini memaksa ulang
-       styling utama supaya sidebar tetap konsisten dengan tampilan laptop. */
     @media (max-width: 640px) {{
-        /* PENTING: lebar 100% hanya dipaksakan saat sidebar sedang terbuka
-           (aria-expanded="true"). Kalau dipaksakan tanpa syarat, animasi
-           collapse/tutup bawaan Streamlit jadi tertahan setengah jalan
-           karena "dilawan" oleh width:100% ini. */
         section[data-testid="stSidebar"][aria-expanded="true"] {{
             width: 100% !important;
             min-width: 100% !important;
@@ -410,14 +397,11 @@ st.markdown(f"""
             width: 0 !important;
             min-width: 0 !important;
         }}
-        /* Beri jarak samping supaya konten sidebar tidak menempel ke tepi
-           layar (terkesan "kepenuhan"/terlalu lebar) */
         section[data-testid="stSidebar"] > div:first-child {{
             padding-left: 14px !important;
             padding-right: 14px !important;
             box-sizing: border-box !important;
         }}
-        /* Rapatkan jarak kosong di bagian paling atas sidebar pada mobile */
         header[data-testid="stHeader"] {{
             height: 2.75rem !important;
             min-height: 2.75rem !important;
@@ -425,8 +409,6 @@ st.markdown(f"""
         section[data-testid="stSidebar"] {{
             padding-top: 0.5rem !important;
         }}
-        /* Poles visual overlay sidebar di HP supaya terasa seperti panel/drawer
-           modern (ada shadow, transisi halus), senada dengan versi desktop */
         section[data-testid="stSidebar"][aria-expanded="true"] {{
             box-shadow: 4px 0 24px -4px rgba(22, 27, 51, 0.18) !important;
             transition: width 0.25s ease, transform 0.25s ease !important;
@@ -1083,35 +1065,77 @@ elif nav == "5. Dashboard & Visualisasi":
 
         else:
             df_trend = st.session_state["data_bersih"].copy()
-            df_trend["Bulan"] = df_trend["Tanggal Faktur"].dt.to_period("M").dt.to_timestamp()
-            monthly_rekap = df_trend.groupby("Bulan").agg(Total_Qty=("Qty", "sum")).reset_index().sort_values("Bulan")
+            unique_months_count = df_trend["Tanggal Faktur"].dt.to_period("M").nunique()
 
-            monthly_rekap["Bulan_Label"] = monthly_rekap["Bulan"].dt.strftime("%b %Y")
+            # Jika data hanya mencakup 1 bulan, tampilkan grafik garis harian
+            if unique_months_count <= 1:
+                df_trend["Tanggal_Harian"] = df_trend["Tanggal Faktur"].dt.date
+                daily_rekap = df_trend.groupby("Tanggal_Harian").agg(Total_Qty=("Qty", "sum")).reset_index().sort_values("Tanggal_Harian")
+                daily_rekap["Tanggal_Label"] = pd.to_datetime(daily_rekap["Tanggal_Harian"]).dt.strftime("%d %b %Y")
 
-            fig_line = px.area(
-                monthly_rekap,
-                x="Bulan_Label",
-                y="Total_Qty",
-                markers=True,
-                labels={"Bulan_Label": "Bulan"}
-            )
-            fig_line.update_traces(line_color=COLOR_PRIMARY, fillcolor="rgba(55,48,209,0.12)")
-            apply_plotly_theme(fig_line, "Grafik Tren Historis Kuantitas Penjualan Bulanan")
-            fig_line.update_layout(
-                height=400,
-                margin=dict(t=55, l=10, r=20, b=90),
-                xaxis=dict(
-                    title="Bulan",
-                    tickfont=dict(color=COLOR_INK, size=12),
-                    title_font=dict(color=COLOR_INK),
-                    categoryorder="array",
-                    categoryarray=monthly_rekap["Bulan_Label"].tolist(),
-                    tickangle=-35
+                fig_line = px.line(
+                    daily_rekap,
+                    x="Tanggal_Label",
+                    y="Total_Qty",
+                    markers=True,
+                    labels={"Tanggal_Label": "Tanggal Transaksi", "Total_Qty": "Total Qty Terjual"}
                 )
-            )
-            st.plotly_chart(fig_line, use_container_width=True)
+                fig_line.update_traces(line_color=COLOR_PRIMARY, line_width=2.5, marker=dict(size=6, color=COLOR_PRIMARY))
+                apply_plotly_theme(fig_line, "Grafik Tren Penjualan Harian (Periode 1 Bulan)")
+                fig_line.update_layout(
+                    height=400,
+                    margin=dict(t=55, l=10, r=20, b=90),
+                    xaxis=dict(
+                        title="Tanggal Transaksi",
+                        tickfont=dict(color=COLOR_INK, size=11),
+                        title_font=dict(color=COLOR_INK),
+                        categoryorder="array",
+                        categoryarray=daily_rekap["Tanggal_Label"].tolist(),
+                        tickangle=-35
+                    )
+                )
+                st.plotly_chart(fig_line, use_container_width=True)
 
-            if len(monthly_rekap) >= 2:
+                total_qty_bln = int(daily_rekap["Total_Qty"].sum())
+                max_row = daily_rekap.loc[daily_rekap["Total_Qty"].idxmax()]
+                peak_date = pd.to_datetime(max_row["Tanggal_Harian"]).strftime("%d %B %Y")
+                peak_qty = int(max_row["Total_Qty"])
+
+                st.info(
+                    f"💡 **Saran untuk Toko Anda:** Grafik di atas menampilkan tren penjualan harian sepanjang periode data yang Anda unggah dengan total volume penjualan sebesar **{total_qty_bln:,} unit**. "
+                    f"Tercatat penjualan tertinggi toko Anda terjadi pada tanggal **{peak_date}** dengan jumlah **{peak_qty:,} unit**. "
+                    f"Jadikan tanggal-tanggal sibuk seperti ini sebagai acuan untuk **menyiapkan stok lebih banyak** dan menambah kesiapan operasional agar tidak kehabisan barang. "
+                    f"Sebaliknya, pada hari-hari yang penjualannya cenderung sepi, adakan **promo khusus atau diskon produk** agar omzet tetap stabil dan modal berputar dengan lancar."
+                )
+            else:
+                # Jika data lebih dari 1 bulan, tampilkan grafik area bulanan
+                df_trend["Bulan"] = df_trend["Tanggal Faktur"].dt.to_period("M").dt.to_timestamp()
+                monthly_rekap = df_trend.groupby("Bulan").agg(Total_Qty=("Qty", "sum")).reset_index().sort_values("Bulan")
+                monthly_rekap["Bulan_Label"] = monthly_rekap["Bulan"].dt.strftime("%b %Y")
+
+                fig_line = px.area(
+                    monthly_rekap,
+                    x="Bulan_Label",
+                    y="Total_Qty",
+                    markers=True,
+                    labels={"Bulan_Label": "Bulan"}
+                )
+                fig_line.update_traces(line_color=COLOR_PRIMARY, fillcolor="rgba(55,48,209,0.12)")
+                apply_plotly_theme(fig_line, "Grafik Tren Historis Kuantitas Penjualan Bulanan")
+                fig_line.update_layout(
+                    height=400,
+                    margin=dict(t=55, l=10, r=20, b=90),
+                    xaxis=dict(
+                        title="Bulan",
+                        tickfont=dict(color=COLOR_INK, size=12),
+                        title_font=dict(color=COLOR_INK),
+                        categoryorder="array",
+                        categoryarray=monthly_rekap["Bulan_Label"].tolist(),
+                        tickangle=-35
+                    )
+                )
+                st.plotly_chart(fig_line, use_container_width=True)
+
                 qty_awal = monthly_rekap.iloc[0]["Total_Qty"]
                 qty_akhir = monthly_rekap.iloc[-1]["Total_Qty"]
                 arah_tren = "meningkat" if qty_akhir >= qty_awal else "menurun"
@@ -1122,8 +1146,6 @@ elif nav == "5. Dashboard & Visualisasi":
                     f"Kalau penjualannya sedang naik, yuk siap-siap tambah stok dari awal supaya tidak keteteran melayani pembeli. "
                     f"Sebaliknya, kalau trennya melambat, kurangi belanja barang yang kurang laku agar kas toko tetap aman."
                 )
-            else:
-                st.info("💡 **Saran untuk Toko Anda:** Catatan transaksi historis pada data yang diunggah belum mencakup rentang waktu lebih dari satu bulan, sehingga grafik tren bulanan belum dapat menampilkan perbandingan antar bulan.")
 
         render_nav_buttons(4, label_override="Lanjut ke 📥 Unduh Laporan →")
     else:
@@ -1230,4 +1252,4 @@ elif nav == "6. Unduh Laporan":
         st.warning("Belum terdapat data hasil analisis. Harap selesaikan proses hingga Menu 4 terlebih dahulu.")
 
     render_card_close()
-    render_nav_buttons(5)   
+    render_nav_buttons(5)
